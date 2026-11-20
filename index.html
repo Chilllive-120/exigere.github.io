@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Экзамен — Охрана труда</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#008080">
+<link rel="icon" href="img/icon-192.png">
+<link rel="apple-touch-icon" href="img/icon-192.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<style>
+:root{
+  --bg:#eef6f6; --card:#fff; --text:#16302f; --muted:#5b7473;
+  --brand:#008080; --brand-d:#006666; --brand-l:#d9f0ef;
+  --ok:#1b7f4b; --ok-bg:#e3f6ec; --bad:#b3261e; --bad-bg:#fdeceb;
+  --line:#d5e4e3; --radius:16px; --shadow:0 6px 24px rgba(0,80,80,.10);
+}
+@media (prefers-color-scheme:dark){
+  :root{--bg:#0f1f1f; --card:#162a2a; --text:#e6f2f1; --muted:#93b0ae; --brand:#26b3ac; --brand-d:#1a8e88; --brand-l:#1d3a39;
+    --ok:#6ad39a; --ok-bg:#15352a; --bad:#ff8a80; --bad-bg:#3a1f1d; --line:#254443; --shadow:0 6px 24px rgba(0,0,0,.4);}
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;font:17px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;color:var(--text);background:var(--bg)}
+.wrap{max-width:820px;margin:0 auto;padding:16px}
+header{display:flex;align-items:center;gap:14px;padding:8px 4px 16px}
+header img{width:64px;height:auto;flex:none}
+header h1{font-size:1.1rem;line-height:1.3;margin:0}
+header small{color:var(--muted);display:block;font-weight:400}
+.card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:22px;margin-bottom:16px}
+.hidden{display:none!important}
+
+/* кнопки */
+.btn{font:inherit;font-weight:600;border:0;border-radius:12px;padding:13px 22px;cursor:pointer;background:var(--brand);color:#fff;transition:.15s;text-decoration:none;display:inline-block}
+.btn:hover:not(:disabled){background:var(--brand-d);transform:translateY(-1px)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn.ghost{background:var(--brand-l);color:var(--brand-d)}
+@media (prefers-color-scheme:dark){.btn{color:#06201f}.chip[aria-pressed="true"]{color:#06201f}}
+@media (prefers-color-scheme:dark){.btn.ghost{color:var(--text)!important}}
+
+/* стартовый экран */
+.start h2{margin:0 0 4px}
+.start p{margin:0 0 14px;color:var(--muted)}
+.chips{display:flex;flex-wrap:wrap;gap:10px;margin:12px 0}
+.chip{font:inherit;border:2px solid var(--line);background:transparent;color:var(--text);border-radius:999px;padding:8px 18px;cursor:pointer;min-width:52px}
+.chip[aria-pressed="true"]{border-color:var(--brand);background:var(--brand);color:#fff;font-weight:600}
+.custom{display:flex;align-items:center;gap:10px;margin:8px 0 18px;color:var(--muted)}
+.custom input{font:inherit;width:90px;padding:8px 10px;border-radius:10px;border:2px solid var(--line);background:transparent;color:var(--text)}
+.rule{font-size:.9rem;color:var(--muted);margin:0 0 18px}
+
+/* шапка теста: прогресс */
+.topbar{position:sticky;top:0;z-index:5;background:var(--bg);padding:10px 0 6px}
+.bar{height:8px;border-radius:99px;background:var(--line);overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:var(--brand);transition:width .25s}
+.progress{font-size:.9rem;color:var(--muted);margin-top:6px;text-align:center}
+
+/* вопрос */
+.q{padding:20px}
+.q-head{display:flex;gap:16px;align-items:flex-start;margin-bottom:12px}
+.q-title{flex:1;font-weight:600}
+.q-title .n{color:var(--brand);margin-right:6px}
+.q-img{flex:none;width:170px;max-height:130px;object-fit:cover;border-radius:12px;border:1px solid var(--line);cursor:zoom-in;background:var(--brand-l)}
+.opt{display:flex;gap:12px;align-items:flex-start;padding:12px 14px;margin:8px 0;border:2px solid var(--line);border-radius:12px;cursor:pointer;transition:.12s}
+.opt:hover{border-color:var(--brand)}
+.opt input{margin-top:.3em;accent-color:var(--brand);transform:scale(1.25);flex:none}
+.opt:has(input:checked){border-color:var(--brand);background:var(--brand-l)}
+.opt:has(input:disabled){cursor:default}
+
+/* результаты */
+.score{text-align:center}
+.score .big{font-size:2.4rem;font-weight:800;margin:0}
+.score.pass .big,.score.pass h3{color:var(--ok)} .score.fail .big,.score.fail h3{color:var(--bad)}
+.res{border-left:5px solid;border-radius:12px;padding:14px 16px;margin:10px 0;font-size:.97rem}
+.res.ok{border-color:var(--ok);background:var(--ok-bg)} .res.no{border-color:var(--bad);background:var(--bad-bg)}
+.res b{display:inline-block;min-width:0}
+
+/* увеличение картинки */
+#lightbox{position:fixed;inset:0;background:rgba(0,0,0,.85);display:flex;align-items:center;justify-content:center;z-index:50;padding:16px;cursor:zoom-out}
+#lightbox img{max-width:100%;max-height:100%;border-radius:12px}
+
+@media (max-width:600px){
+  body{font-size:18px}
+  .q-head{flex-direction:column}
+  .q-img{width:100%;max-height:190px}
+  .btn{width:100%;margin-top:8px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <img src="img/logo.png" alt="Логотип Examen">
+    <h1>Экзамен «Охрана труда для операторов окрасочно-сушильных линий и агрегатов»</h1>
+  </header>
+  <a href="biblioteka_documentov.html" class="btn ghost">📚 Библиотека документов</a>
+  <div style="height:16px"></div>
+
+  <!-- 1. Выбор количества вопросов -->
+  <section id="start" class="card start">
+    <h2>Сколько вопросов показать?</h2>
+    <p>Выберите количество или введите своё. Вопросы выбираются случайно.</p>
+    <div class="chips" id="chips"></div>
+    <label class="custom">Своё число: <input id="custom" type="number" min="1" inputmode="numeric"> <span id="max"></span></label>
+    <p class="rule" id="rule"></p>
+    <button class="btn" id="begin">Начать экзамен</button>
+  </section>
+
+  <!-- 2. Тест -->
+  <section id="exam" class="hidden">
+    <div class="topbar">
+      <div class="bar"><i id="barfill"></i></div>
+      <div class="progress" id="progress"></div>
+    </div>
+    <div id="quiz-container"></div>
+    <div style="text-align:center">
+      <button class="btn" id="submit-btn" disabled>Завершить экзамен</button>
+    </div>
+  </section>
+
+  <!-- 3. Результаты -->
+  <section id="results" class="hidden"></section>
+</div>
+<div id="lightbox" class="hidden"><img alt=""></div>
+
+<script src="questions.js"></script>
+<script src="quiz.js"></script>
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
+}
+</script>
+</body>
+</html>
